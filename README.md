@@ -13,17 +13,25 @@ Given an input file like `template.html`, the converter creates:
 
 The HTML conversion currently performs these changes:
 
-- Replaces any `<a>` tag whose `href` exactly matches the provided confirmation URL with `{{LINK \`confirm\`}}`
+- Replaces any `<a>` tag whose `href` exactly matches the provided confirmation URL with the GetResponse confirmation macro shown below
 - Removes `<td>` blocks whose class starts with `gr-footer-`
 - Removes `<td>` blocks whose class starts with `gr-headerviewonline-`
 - Replaces supported dynamic placeholders with GetResponse contact macros
 
+Confirmation macro:
+
+```text
+{{LINK `confirm`}}
+```
+
 Supported placeholder replacements:
 
-- `[[firstname]]` -> `{{CONTACT \`subscriber_first_name\`}}`
-- `[[lastname]]` -> `{{CONTACT \`subscriber_last_name\`}}`
-- `[[email]]` -> `{{CONTACT \`email\`}}`
-- `[[name]]` -> `{{CONTACT \`name\`}}`
+```text
+[[firstname]] -> {{CONTACT `subscriber_first_name`}}
+[[lastname]]  -> {{CONTACT `subscriber_last_name`}}
+[[email]]     -> {{CONTACT `email`}}
+[[name]]      -> {{CONTACT `name`}}
+```
 
 The plain-text output is generated from the converted HTML and replaces confirmation links with the same GetResponse confirmation macro.
 
