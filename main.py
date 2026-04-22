@@ -7,8 +7,8 @@ CONFIRMATION_LINK = "{{LINK `confirm`}}"
 DYNAMIC_CONTENT_TAGS = {
     "[[firstname]]": "{{CONTACT `subscriber_first_name`}}",
     "[[lastname]]": "{{CONTACT `subscriber_last_name`}}",
-    "[[email]]": "{{CONTACT `email`}}",
-    "[[name]]": "{{CONTACT `name`}}",
+    "[[email]]": "{{CONTACT `subscriber_email`}}",
+    "[[name]]": "{{CONTACT `subscriber_name`}}",
 }
 
 
