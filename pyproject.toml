@@ -1,7 +1,9 @@
 [project]
 name = "confirmation-message-converter"
 version = "0.1.0"
-description = "Add your description here"
+description = "Convert an HTML template into a GetResponse confirmation message"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "beautifulsoup4>=4.12,<5",
+]
