@@ -2,6 +2,7 @@ import argparse
 import os
 from bs4 import BeautifulSoup
 
+CONFIRMATION_LINK = "{{LINK `confirm`}}"
 
 def main():
     parser = argparse.ArgumentParser(description="Confirmation message converter")
@@ -15,8 +16,12 @@ def main():
 
 
     file_data = parse_html_file(file_path, url)
+    plain_text = extract_plain_text_version(file_data)
+    
+    write_to_html_file(file_path, file_data)
+    write_to_txt_file(file_path, plain_text)
+    
 
-    write_to_new_file(file_path, file_data)
 
 def read_file_data(file_path:  str) -> str: 
     
@@ -30,7 +35,7 @@ def parse_html_file(file_path: str, url: str = "https://getresponse.com/?confirm
     soup = BeautifulSoup(file_data, "html.parser")
 
     for a in soup.find_all("a", href=url):
-        a["href"] = "{{LINK `confirm`}}"
+        a["href"] = CONFIRMATION_LINK
 
     for td in soup.find_all("td"):
         classes = td.get("class", [])
@@ -39,7 +44,7 @@ def parse_html_file(file_path: str, url: str = "https://getresponse.com/?confirm
 
     return soup.prettify()
 
-def write_to_new_file(file_path: str, file_content: str):
+def write_to_html_file(file_path: str, file_content: str):
     input_dir = os.path.dirname(file_path)
     input_filename = os.path.basename(file_path)
 
@@ -50,6 +55,31 @@ def write_to_new_file(file_path: str, file_content: str):
 
     with open(output_filepath, 'w', encoding="utf-8") as f:
         f.write(str(file_content))
+
+def extract_plain_text_version(file_content: str) -> str:
+
+    soup = BeautifulSoup(file_content, "html.parser")
+
+    for tag in soup(["script", "style"]):
+        tag.decompose()
+
+    for a in soup.find_all("a", href=CONFIRMATION_LINK):
+        a.replace_with(CONFIRMATION_LINK)
+
+    return soup.get_text(separator="\n", strip=True)
+
+def write_to_txt_file(file_path: str, file_content: str):
+    input_dir = os.path.dirname(file_path)
+    input_filename = os.path.basename(file_path)
+
+    base, _ = os.path.splitext(input_filename)
+    output_filename = f"{base}_converted.txt"
+
+    output_filepath = os.path.join(input_dir, output_filename)
+
+    with open(output_filepath, 'w', encoding="utf-8") as f:
+        f.write(str(file_content))
+
 
 
 
