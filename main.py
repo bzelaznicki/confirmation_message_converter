@@ -2,7 +2,15 @@ import argparse
 import os
 from bs4 import BeautifulSoup
 
+DEFAULT_PLACEHOLDER = "https://getresponse.com/?confirmation_click"
 CONFIRMATION_LINK = "{{LINK `confirm`}}"
+DYNAMIC_CONTENT_TAGS = {
+    "[[firstname]]": "{{CONTACT `subscriber_first_name`}}",
+    "[[lastname]]": "{{CONTACT `subscriber_last_name`}}",
+    "[[email]]": "{{CONTACT `email`}}",
+    "[[name]]": "{{CONTACT `name`}}",
+}
+
 
 def main():
     parser = argparse.ArgumentParser(description="Confirmation message converter")
@@ -12,8 +20,7 @@ def main():
     args = parser.parse_args()
 
     file_path = args.file_path
-    url = args.url
-
+    url = args.url if args.url else DEFAULT_PLACEHOLDER
 
     file_data = parse_html_file(file_path, url)
     plain_text = extract_plain_text_version(file_data)
@@ -28,21 +35,27 @@ def read_file_data(file_path:  str) -> str:
     with open(file_path, 'r') as read_file:
         return read_file.read()
 
-def parse_html_file(file_path: str, url: str = "https://getresponse.com/?confirmation_click"):
+def parse_html_file(file_path: str, url: str = DEFAULT_PLACEHOLDER):
 
     file_data = read_file_data(file_path)
 
     soup = BeautifulSoup(file_data, "html.parser")
+
 
     for a in soup.find_all("a", href=url):
         a["href"] = CONFIRMATION_LINK
 
     for td in soup.find_all("td"):
         classes = td.get("class", [])
-        if any(c.startswith("gr-footer-") for c in classes):
+        if any(c.startswith("gr-footer-") or c.startswith("gr-headerviewonline-") for c in classes):
             td.decompose()
 
-    return soup.prettify()
+    html_content = soup.prettify()
+
+    for old, new in DYNAMIC_CONTENT_TAGS.items():
+        html_content = html_content.replace(old, new)
+
+    return html_content
 
 def write_to_html_file(file_path: str, file_content: str):
     input_dir = os.path.dirname(file_path)
