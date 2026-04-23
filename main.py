@@ -41,9 +41,14 @@ def parse_html_file(file_path: str, url: str = DEFAULT_PLACEHOLDER):
 
     soup = BeautifulSoup(file_data, "html.parser")
 
+    confirmation_link_found = False
 
     for a in soup.find_all("a", href=url):
         a["href"] = CONFIRMATION_LINK
+        confirmation_link_found = True
+
+    if not confirmation_link_found:
+        raise Exception("Message is missing a confirmation link")
 
     for td in soup.find_all("td"):
         classes = td.get("class", [])
